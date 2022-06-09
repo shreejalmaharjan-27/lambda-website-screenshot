@@ -7,12 +7,12 @@ export default async (event: any) => {
   const puppeteer = getPuppeteer()
   try {
     const params = event.queryStringParameters || {}
-    const { url = '', width = 1500, height = 900 } = params
+    const { url = '', width = 1500, height = 900, userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.3.5029.61 Safari/537.36' } = params
 
     if (!url || !url.startsWith('http')) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ massage: 'you should specify page URL' }),
+        body: JSON.stringify({ message: 'you should specify page URL',error:true }),
       }
     }
 
@@ -24,6 +24,7 @@ export default async (event: any) => {
     })
 
     const page = await browser.newPage()
+    page.setUserAgent(userAgent);
     page.setViewport({ width: Number(width), height: Number(height) })
     await page.goto(url)
     const imageBuffer = await page.screenshot()
@@ -38,7 +39,7 @@ export default async (event: any) => {
     return {
       statusCode: 500,
       body: JSON.stringify({
-        massage: 'Something going wrong on backend side',
+        message: 'Something going wrong on backend side',error:true
       }),
     }
   }
